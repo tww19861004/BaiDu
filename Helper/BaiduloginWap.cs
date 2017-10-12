@@ -20,10 +20,13 @@ namespace Helper
         {
             get
             {
-                return "https://wappass.baidu.com/wp/api/login?tt="+ HttpUtil.GetTimeStamp();
+                return "https://wappass.baidu.com/wp/api/login?tt=" + HttpUtil.GetTimeStamp();
             }
         }
 
+        public BaiduloginWap(string userName, string password):base(userName, password)
+        {
+        }
         protected override string TPL
         {
             get
@@ -32,7 +35,7 @@ namespace Helper
             }
         }
 
-        protected override string Login(string verifyCode)
+        public override string Login(string verifyCode)
         {
             if (IsNeedVerifyCode)
             {
@@ -80,17 +83,12 @@ namespace Helper
                     {"callback", "parent.bd__pcbs__"+HttpUtil.GenerateCallBack()},
                });
             httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
-            //httpClient.DefaultRequestHeaders.Clear();            
-            //httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-CN,zh;q=0.8");
-            //httpClient.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
             HttpResponseMessage response = httpClient.PostAsync(new Uri(loginPostURL), httpContent).Result;
             response.EnsureSuccessStatusCode();
             String result = response.Content.ReadAsStringAsync().Result;
 
             if (response.StatusCode.Equals(HttpStatusCode.OK))
             {
-                //var cookies = HttpHelper.GetAllCookies(cookieContainer);
-                //return HttpHelper.GetAllCookies(cookieContainer).FirstOrDefault(c => c.Name.Equals("BDUSS")) != null;                
                 int i1 = result.IndexOf("err_no=");
                 int i2 = result.IndexOf("&callback=");
                 string errno = result.Substring(i1, i2 - i1).Replace("err_no=", "");

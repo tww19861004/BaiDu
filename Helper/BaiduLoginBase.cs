@@ -21,12 +21,13 @@ namespace Helper
 
         }
         #region 变量
-        private string gid = null;        
-        private string token;
-        HttpClient httpClient = null;
+        protected string gid = null;
+        protected string token;
+        protected HttpClient httpClient = null;
+        protected HttpClientHandler httpClientHandler = null;
         protected string userName = null;
         protected string password = null;
-        private bool isNeedVerifyCode = true;//是否需要验证码
+        protected bool isNeedVerifyCode = true;//是否需要验证码
         public bool IsNeedVerifyCode
         {
             get
@@ -67,7 +68,8 @@ namespace Helper
         {            
             gid = Guid.NewGuid().ToString().Substring(1);
             regex = new Regex(@"\{.*\}", RegexOptions.IgnoreCase);
-            httpClient = new HttpClient();
+            httpClientHandler = new HttpClientHandler() { UseCookies = false};
+            httpClient = new HttpClient(httpClientHandler);
             httpClient.MaxResponseContentBufferSize = 256000;
             httpClient.DefaultRequestHeaders.Add("user-agent", UserAgent);            
             if (!GetToken())
@@ -222,7 +224,7 @@ namespace Helper
             return null;
         }
 
-        protected virtual string Login(string verifyCode)
+        public virtual string Login(string verifyCode)
         {
             if (IsNeedVerifyCode)
             {
@@ -313,7 +315,7 @@ namespace Helper
             return res;
         }
 
-        private bool CheckValCode(string code)
+        protected bool CheckValCode(string code)
         {
             var nvc = new NameValueCollection
             {
