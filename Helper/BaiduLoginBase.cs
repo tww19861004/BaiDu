@@ -16,7 +16,7 @@ namespace Helper
 {
     public class LoginBaiduBase
     {
-        private LoginBaiduBase()
+        protected LoginBaiduBase()
         {
 
         }
@@ -24,8 +24,8 @@ namespace Helper
         private string gid = null;        
         private string token;
         HttpClient httpClient = null;
-        private string userName = null;
-        private string password = null;
+        protected string userName = null;
+        protected string password = null;
         private bool isNeedVerifyCode = true;//是否需要验证码
         public bool IsNeedVerifyCode
         {
@@ -39,10 +39,10 @@ namespace Helper
                 isNeedVerifyCode = value;
             }
         }
-        private string verifyStr = string.Empty;
-        private string valcode = string.Empty;
-        private string pubksy = string.Empty;
-        private string rsakey = string.Empty;        
+        protected string verifyStr = string.Empty;
+        protected string valcode = string.Empty;
+        protected string pubksy = string.Empty;
+        protected string rsakey = string.Empty;        
 
         private Regex regex ;
 
@@ -222,7 +222,7 @@ namespace Helper
             return null;
         }
 
-        public string Login(string verifyCode)
+        protected virtual string Login(string verifyCode)
         {
             if (IsNeedVerifyCode)
             {

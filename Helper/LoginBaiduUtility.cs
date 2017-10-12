@@ -299,7 +299,7 @@ namespace Helper
             return res;
         }
 
-        private bool CheckValCode(string code)
+        protected virtual bool CheckValCode(string code)
         {
             var nvc = new NameValueCollection
             {
