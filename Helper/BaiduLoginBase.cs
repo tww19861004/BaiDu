@@ -63,13 +63,18 @@ namespace Helper
             get { return "https://passport.baidu.com/v2/api/?login"; }
         }
 
+        protected virtual string staticpage
+        {
+            get { return "https://passport.baidu.com/static/passpc-account/html/v3Jump.html"; }
+        }
+
         #endregion
         public LoginBaiduBase(string userName, string password)
         {            
             gid = Guid.NewGuid().ToString().Substring(1);
             regex = new Regex(@"\{.*\}", RegexOptions.IgnoreCase);
-            httpClientHandler = new HttpClientHandler() { UseCookies = false};
-            httpClient = new HttpClient(httpClientHandler);
+            httpClientHandler = new HttpClientHandler() { };
+            httpClient = new HttpClient(httpClientHandler);            
             httpClient.MaxResponseContentBufferSize = 256000;
             httpClient.DefaultRequestHeaders.Add("user-agent", UserAgent);            
             if (!GetToken())
@@ -238,8 +243,7 @@ namespace Helper
             var password = RSAHelper.RSAEncrypt(pemToXml, this.password);
             var httpContent = new FormUrlEncodedContent(new Dictionary<string, string>()
                {
-                    {"staticpage", "https://passport.baidu.com/static/passpc-account/html/v3Jump.html"},
-                    //{"staticpage","http://app.baidu.com/sfile/v3Jump.html"},
+                    {"staticpage", staticpage},                    
                     {"charset", "UTF-8"},
                     {"token", token},
                     {"tpl", TPL},

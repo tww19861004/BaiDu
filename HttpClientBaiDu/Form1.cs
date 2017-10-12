@@ -1,4 +1,5 @@
 ﻿using Helper;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,13 +20,13 @@ namespace HttpClientBaiDu
             InitializeComponent();
         }
 
-        private LoginBaiduBase loginBaidu = null;
+        private BaiduLoginWise loginBaidu = null;
 
         private void Form1_Load(object sender, EventArgs e)
         {
             try
             {
-                loginBaidu = new LoginBaiduBase("382233701@qq.com", "Tww19861004#");
+                loginBaidu = new BaiduLoginWise("382233701@qq.com", "Tww19861004#");
                 if (loginBaidu.IsNeedVerifyCode)
                 {
                     Stream s = loginBaidu.GetValidImage();
@@ -51,6 +52,18 @@ namespace HttpClientBaiDu
             Stream s = loginBaidu.GetValidImage();
             pictureBox1.Image = Image.FromStream(s);
             pictureBox1.Refresh();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            //生成百度id
+            //从注册表中读取默认浏览器可执行文件路径  
+            RegistryKey key = Registry.ClassesRoot.OpenSubKey(@"http\shell\open\command\");
+            string s = key.GetValue("").ToString();
+
+            //s就是你的默认浏览器，不过后面带了参数，把它截去，不过需要注意的是：不同的浏览器后面的参数不一样！  
+            //"D:\Program Files (x86)\Google\Chrome\Application\chrome.exe" -- "%1"  
+            System.Diagnostics.Process.Start(s.Substring(0, s.Length - 8), "https://www.baidu.com/");
         }
     }
 }

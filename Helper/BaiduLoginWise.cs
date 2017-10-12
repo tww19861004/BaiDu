@@ -14,7 +14,7 @@ using System.Net.Http.Headers;
 
 namespace Helper
 {
-    public class BaiduLoginHi : LoginBaiduBase
+    public class BaiduLoginWise : LoginBaiduBase
     {
         protected override string TPL
         {
@@ -24,9 +24,14 @@ namespace Helper
             }
         }
 
-        public override string Login(string verifyCode)
+        protected override string staticpage
         {
-            return base.Login(verifyCode);
+            get
+            {
+                return "http://app.baidu.com/sfile/v3Jump.html";
+            }
         }
+
+        public BaiduLoginWise(string userName, string password) : base(userName, password) { }
     }
 }

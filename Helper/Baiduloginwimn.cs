@@ -14,7 +14,7 @@ using System.Net.Http.Headers;
 
 namespace Helper
 {
-    public class BaiduloginWap : LoginBaiduBase
+    public class BaiduloginWimn : LoginBaiduBase
     {
         protected override string loginPostURL
         {
@@ -24,7 +24,7 @@ namespace Helper
             }
         }
 
-        public BaiduloginWap(string userName, string password):base(userName, password)
+        public BaiduloginWimn(string userName, string password):base(userName, password)
         {
         }
         protected override string TPL
