@@ -26,7 +26,7 @@ namespace HttpClientBaiDu
         {
             try
             {
-                loginBaidu = new BaiduLoginWise("382233701@qq.com", "Tww19861004#");
+                loginBaidu = new BaiduLoginWise("382233701@qq.com", "Tww119861004#");
                 if (loginBaidu.IsNeedVerifyCode)
                 {
                     Stream s = loginBaidu.GetValidImage();

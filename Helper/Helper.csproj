@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaiduLoginBase.cs" />
+    <Compile Include="BaiduLoginmn.cs" />
     <Compile Include="BaiduLoginWise.cs" />
     <Compile Include="BaiduloginWimn.cs" />
     <Compile Include="HttpUtil.cs" />
