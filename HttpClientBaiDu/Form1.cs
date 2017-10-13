@@ -26,7 +26,7 @@ namespace HttpClientBaiDu
         {
             try
             {
-                loginBaidu = new BaiduLoginWise("382233701@qq.com", "Tww119861004#");
+                loginBaidu = new BaiduLoginWise("3822337011@qq.com", "Tww119861004#");
                 if (loginBaidu.IsNeedVerifyCode)
                 {
                     Stream s = loginBaidu.GetValidImage();
@@ -44,7 +44,8 @@ namespace HttpClientBaiDu
 
         private void button1_Click(object sender, EventArgs e)
         {
-            loginBaidu.Login(this.textBox1.Text.Trim());
+            string res = loginBaidu.Login(this.textBox1.Text.Trim());
+            string baiduid = loginBaidu.GetBaiduId();
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -64,6 +65,8 @@ namespace HttpClientBaiDu
             //s就是你的默认浏览器，不过后面带了参数，把它截去，不过需要注意的是：不同的浏览器后面的参数不一样！  
             //"D:\Program Files (x86)\Google\Chrome\Application\chrome.exe" -- "%1"  
             System.Diagnostics.Process.Start(s.Substring(0, s.Length - 8), "https://www.baidu.com/");
+
+
         }
     }
 }

@@ -16,11 +16,13 @@ namespace Helper
 {
     public class BaiduLoginWise : LoginBaiduBase
     {
+        //http://app.baidu.com/
+        //百度移动开发平台
         protected override string TPL
         {
             get
             {
-                return "wise";
+                return "appsearch";
             }
         }
 

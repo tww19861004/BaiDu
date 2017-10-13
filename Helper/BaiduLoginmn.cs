@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace Helper
 {
-    public class BaiduLoginmn
+    public class BaiduLoginmn : LoginBaiduBase
     {
-
+        protected override string TPL
+        {
+            get
+            {
+                return "mn";
+            }
+        }
+        public BaiduLoginmn(string userName, string password) : base(userName, password) { }
     }
 }
