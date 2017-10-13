@@ -85,16 +85,22 @@ namespace Helper
             regex = new Regex(@"\{.*\}", RegexOptions.IgnoreCase);
             httpClientHandler = new HttpClientHandler() {
                 //UseCookies = false //这里为false表示不采用HttpClient的默认Cookie,而是采用httpRequestmessage的Cookie
-            };
+            };                      
 
             //var message = new HttpRequestMessage(HttpMethod.Post, "/test");
             //message.Headers.Add("Cookie", "cookie1=value1; cookie2=value2");
             //var result = await client.SendAsync(message);
 
             httpClient = new HttpClient(httpClientHandler);
-            httpClient.BaseAddress = new Uri("https://www.baidu.com/");
             httpClient.MaxResponseContentBufferSize = 256000;
-            httpClient.DefaultRequestHeaders.Add("user-agent", UserAgent);            
+            httpClient.DefaultRequestHeaders.Add("user-agent", UserAgent);
+
+            HttpResponseMessage response = httpClient.GetAsync(new Uri("https://www.baidu.com/")).Result;
+            String result = response.Content.ReadAsStringAsync().Result;
+
+            //获取baiduid
+            string baiduid = GetBaiduId();
+                                            
             if (!GetToken())
             {
                 if (!GetToken())
