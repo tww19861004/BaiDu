@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Helper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -30,6 +31,9 @@ namespace test
             Console.WriteLine("=".PadRight(50, '='));
             Console.WriteLine(handler.CookieContainer.PerDomainCapacity);
 
+            string str1 = CookieHelper.GetCookies("http://www.baidu.com");
+
+            var contailer = CookieHelper.GetUriCookieContainer(new Uri("http://www.baidu.com"));
 
             Console.ReadKey();
         }

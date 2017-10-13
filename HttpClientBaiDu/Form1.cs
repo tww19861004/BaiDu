@@ -66,7 +66,7 @@ namespace HttpClientBaiDu
             //"D:\Program Files (x86)\Google\Chrome\Application\chrome.exe" -- "%1"  
             System.Diagnostics.Process.Start(s.Substring(0, s.Length - 8), "https://www.baidu.com/");
 
-
+            string cookie = CookieHelper.GetCookies("https://www.baidu.com/");
         }
     }
 }
