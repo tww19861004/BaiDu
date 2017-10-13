@@ -53,6 +53,7 @@
     <Compile Include="BaiduLoginmn.cs" />
     <Compile Include="BaiduLoginWise.cs" />
     <Compile Include="BaiduloginWimn.cs" />
+    <Compile Include="BaiduLoginZhidao.cs" />
     <Compile Include="HttpUtil.cs" />
     <Compile Include="LoginBaiduUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -58,6 +58,16 @@ namespace Helper
             get { return "tb"; }
         }
 
+        protected virtual string charset
+        {
+            get { return "UTF-8"; }
+        }
+
+        protected virtual string u
+        {
+            get { return "https://tieba.baidu.com/index.html"; }
+        }
+
         protected virtual string loginPostURL
         {
             get { return "https://passport.baidu.com/v2/api/?login"; }
@@ -76,7 +86,11 @@ namespace Helper
             httpClientHandler = new HttpClientHandler() {
                 //UseCookies = false //这里为false表示不采用HttpClient的默认Cookie,而是采用httpRequestmessage的Cookie
             };
-            
+
+            //var message = new HttpRequestMessage(HttpMethod.Post, "/test");
+            //message.Headers.Add("Cookie", "cookie1=value1; cookie2=value2");
+            //var result = await client.SendAsync(message);
+
             httpClient = new HttpClient(httpClientHandler);
             httpClient.BaseAddress = new Uri("https://www.baidu.com/");
             httpClient.MaxResponseContentBufferSize = 256000;
@@ -163,7 +177,7 @@ namespace Helper
             HttpResponseMessage response = httpClient.GetAsync(new Uri("https://passport.baidu.com/v2/api/?getapi&" + nvc.ToQueryString())).Result;
             response.EnsureSuccessStatusCode();
             String Result = response.Content.ReadAsStringAsync().Result;                        
-            SetBaiduId("526F2BD190311B7485DA0A11FE823F72:FG=1");            
+            SetBaiduId("C1E4B270B18E10C1334AE929582B4159:FG=1");            
             if (response.StatusCode.Equals(HttpStatusCode.OK))
             {
                 if (regex.IsMatch(Result))
@@ -272,7 +286,7 @@ namespace Helper
             var httpContent = new FormUrlEncodedContent(new Dictionary<string, string>()
                {
                     {"staticpage", staticpage},                    
-                    {"charset", "UTF-8"},
+                    {"charset", charset},
                     {"token", token},
                     {"tpl", TPL},
                     {"subpro","" },
@@ -280,7 +294,7 @@ namespace Helper
                     {"tt", HttpUtil.GetTimeStamp()},
                     {"codestring", verifyStr},
                     {"safeflg", "0"},
-                    {"u", "http://app.baidu.com/?regdev=1&regdev=1"},
+                    {"u", u},
                     {"isPhone", "false"},
                     {"detect", "1"},
                     {"quick_user", "0"},
