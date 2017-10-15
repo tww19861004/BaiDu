@@ -17,35 +17,39 @@ namespace test
     {
         static void Main(string[] args)
         {
-            //HttpClientHandler handler = new HttpClientHandler();
-            //handler.UseCookies = true;
-            //var uri = new Uri("http://www.baidu.com");
+            HttpClientHandler handler = new HttpClientHandler();
+            handler.UseCookies = true;
+            var uri = new Uri("http://www.baidu.com");
 
-            ////handler.CookieContainer.SetCookies(uri, "aas=test");
-            //HttpClient client = new HttpClient(handler);
+            //handler.CookieContainer.SetCookies(uri, "aas=test");
+            HttpClient client = new HttpClient(handler);
 
-            //var result = client.GetStringAsync(uri);
-            //Console.WriteLine(result.Result);
-            //var getCookies = handler.CookieContainer.GetCookies(uri);
-            //Console.WriteLine("获取到的cookie数量：" + getCookies.Count);
-            //Console.WriteLine("获取到的cookie：");
-            //for (int i = 0; i < getCookies.Count; i++)
-            //{
-            //    Console.WriteLine(getCookies[i].Name + ":" + getCookies[i].Value);
-            //}
-            //Console.WriteLine("=".PadRight(50, '='));
-            //Console.WriteLine(handler.CookieContainer.PerDomainCapacity);
+            var result = client.GetStringAsync(uri);
+            Console.WriteLine(result.Result);
+            string TEST10 = HttpUtil.GetCookieValue(handler.CookieContainer, "BAIDUID");
+            var getCookies = handler.CookieContainer.GetCookies(uri);
+            Console.WriteLine("获取到的cookie数量：" + getCookies.Count);
+            Console.WriteLine("获取到的cookie：");
+            for (int i = 0; i < getCookies.Count; i++)
+            {
+                Console.WriteLine(getCookies[i].Name + ":" + getCookies[i].Value);
+            }
+            Console.WriteLine("=".PadRight(50, '='));
+            Console.WriteLine(handler.CookieContainer.PerDomainCapacity);
 
-            //string str1 = CookieHelper.GetCookies("http://www.baidu.com");
+            string str1 = CookieHelper.GetCookies("http://www.baidu.com");
 
-            //var contailer = CookieHelper.GetUriCookieContainer(new Uri("http://www.baidu.com"));
+            var contailer = CookieHelper.GetUriCookieContainer(new Uri("http://www.baidu.com"));
 
-            //string TEST1 = HttpUtil.GetCookieValue(contailer, "BAIDUID");
-            LoginBaiduBase loginBaidu = new LoginBaiduBase("382233701@qq.com","Tww19861004#");
-            string res = loginBaidu.Login("");
-            string test = loginBaidu.GetCookieValue("BAIDUID");
-            string test1 = loginBaidu.GetCookieValue("FP_UID");
-            Console.Write(string.Format("BAIDUID:{0}\r\nFP_UID:{1}\r\nres:{2}", test, test1, res));
+            string TEST1 = HttpUtil.GetCookieValue(contailer, "BAIDUID");
+            //LoginBaiduBase loginBaidu = new LoginBaiduBase("382233701@qq.com","Tww19861004#");
+            //string res = loginBaidu.Login("");
+            //string test = loginBaidu.GetCookieValue("BAIDUID");
+            //string test1 = loginBaidu.GetCookieValue("FP_UID");
+            //Console.Write(string.Format("BAIDUID:{0}\r\nFP_UID:{1}\r\nres:{2}", test, test1, res));
+
+            
+
             Console.ReadKey();
         }
 
