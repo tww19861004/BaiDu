@@ -16,6 +16,9 @@ namespace Helper
         [DllImport("wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
         static extern int InternetSetCookieEx(string lpszURL, string lpszCookieName, string lpszCookieData, int dwFlags, IntPtr dwReserved);
 
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        internal static extern Int32 GetLastError();
+
         /**/
         /// <summary>
         /// 通过COM来获取Cookie数据。

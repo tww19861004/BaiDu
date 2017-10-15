@@ -27,7 +27,7 @@ namespace Helper
         public HttpClientHandler httpClientHandler = null;
         protected string userName = null;
         protected string password = null;
-        protected bool isNeedVerifyCode = true;//是否需要验证码
+        protected bool isNeedVerifyCode = true;//是否需要验证码        
         public bool IsNeedVerifyCode
         {
             get
@@ -83,21 +83,22 @@ namespace Helper
             gid = Guid.NewGuid().ToString().Substring(1);
             var uri = new Uri("http://www.baidu.com");
             regex = new Regex(@"\{.*\}", RegexOptions.IgnoreCase);
-            httpClientHandler = new HttpClientHandler(){};
+            httpClientHandler = new HttpClientHandler(){UseCookies=true};
             httpClient = new HttpClient(httpClientHandler);
             httpClient.MaxResponseContentBufferSize = 256000;
             httpClient.DefaultRequestHeaders.Add("user-agent", UserAgent);
 
             var contailer = CookieHelper.GetUriCookieContainer(uri);
+            string TEST1 = HttpUtil.GetCookieValue(contailer, "BAIDUID");
             httpClientHandler.CookieContainer = contailer;
 
-            //获取baiduid
-            string baiduid = GetBaiduId();
-            if (string.IsNullOrEmpty(baiduid))
-            {
-                throw new Exception("baiduid error");
-            }
-                                            
+            ////获取baiduid
+            //string baiduid = GetCookieValue("BAIDUID");
+            //if (string.IsNullOrEmpty(baiduid))
+            //{
+            //    throw new Exception("baiduid error");
+            //}
+
             if (!GetToken())
             {
                 if (!GetToken())
@@ -159,9 +160,9 @@ namespace Helper
             return res;
         }
 
-        public string GetBaiduId()
+        public string GetCookieValue(string cookieName)
         {                        
-            return HttpUtil.GetCookieValue(httpClientHandler.CookieContainer, "BAIDUID");            
+            return HttpUtil.GetCookieValue(httpClientHandler.CookieContainer, cookieName);            
         }
 
         private bool GetToken()
@@ -177,6 +178,9 @@ namespace Helper
                     {"logintype", "dialogLogin"},
                     {"callback", "bd__cbs__"+HttpUtil.GenerateCallBack()},
                 };
+            //SetBaiduId("9A3AE204FEB3DB727707A5A31732D168:FG=1");            
+            string s1 = GetCookieValue("BAIDUID");
+            string s2 = GetCookieValue("FP_UID");
             HttpResponseMessage response = httpClient.GetAsync(new Uri("https://passport.baidu.com/v2/api/?getapi&" + nvc.ToQueryString())).Result;
             response.EnsureSuccessStatusCode();
             String Result = response.Content.ReadAsStringAsync().Result;                        
@@ -244,11 +248,13 @@ namespace Helper
                 //{"vcodetype", "7ea7JrZpMpKLyZu112UWT4NIYUCa8eOetNIn0rP8P6FMti58cJ8BIl1lnRqX9fdeYp84BbSMmr+yLUGUd/Do8yDrI/YV0uaa400z"},
                 {"callback", "bd__cbs__"+HttpUtil.GenerateCallBack()},
             };
-            HttpResponseMessage response = httpClient.GetAsync(new Uri("https://passport.baidu.com/v2/?reggetcodestr&" + nvc.ToQueryString())).Result;
-            response.EnsureSuccessStatusCode();
-            String result = response.Content.ReadAsStringAsync().Result;
 
-            string t1 = GetBaiduId();
+            string s1 = GetCookieValue("BAIDUID");
+            string s2 = GetCookieValue("FP_UID");
+
+            HttpResponseMessage response = httpClient.GetAsync(new Uri("https://passport.baidu.com/v2/?reggetcodestr&" + nvc.ToQueryString())).Result;
+            response.EnsureSuccessStatusCode();            
+            String result = response.Content.ReadAsStringAsync().Result;            
 
             if (response.StatusCode.Equals(HttpStatusCode.OK))
             {
@@ -315,7 +321,7 @@ namespace Helper
                     {"crypttype", "12"},
                     {"ppui_logintime", HttpUtil.Generateplogintime()},
                     {"countrycode", ""},
-                    //{"fp_uid", "960338120bd__cbs__"+HttpUtil.GenerateCallBack()+"8b87eb0671ea3df2d"},
+                    {"fp_uid", GetCookieValue("FP_UID")},
                     //{"fp_info", "960338120bd__cbs__"+HttpUtil.GenerateCallBack()+"8b87eb0671ea3df2d002~~~nxnn3QqCEgie0x2_Unn6yqz090gtoCdtRC_qqz090gtoCd0RC_unmCsVnmCsJnnsEnm3pOq0xwEgi~JIJH4zEp4gVkJAVkFnERaUirBniP4~LPJoEWJ9HdXAFiBzieJAt~4Au~6IskJI2eJnTWcutK4gtOBgugJGJW6ItK8UsianJW6ItKanTw7AE-czFW4mTpXobP4AEYF3JAXAEdJI2M4AwQJzbNJnBRJzHq6UswJAhQ4gJPXnhiJzBHJAwQ6A~W9zukXIJiYgTHJAVk8zieBnE-4zuWcAVw6grNanTLJgiec3tKazhNJEs3FiJHJIBiaRHH4UFiazVw4mLrJn6NBziiBgE-vUnsBqC0Rae0v__DUnvSUnvNUnsPq0KUEgi~JIJH4zEp4gVkJAVkFnERaUirBniP4~LPJoEWJDT9XnhRXdBwBzEn4nuxXmT9XnhRXdBwBzEn4nuxXmT86IFHBzEp4nii4UFu7nERBIFw6zTicusPaUFw6zTi9zukXIJiYgTHJAVkFIwi6dEk6AbWJDTY4dbk6AbWJGFP6dENJAVkFzh-4AukIA0Rnvr3asEYmvaimkP9ZPOov3MEUsAYhIlrZVvKsPFKg1C3kC8nAXMtlhgYdySekQyus4nkJjvvvDXur5lZwCCb~s~aCkfVFUnsKUnsAUnszUnsrnn2LqC7zCNYkl_CqzBAVO4zhd4C__nUnsmnwLYXeksnnvdUnvbnweUkGbjUnvRUnvYUnveUnvpquc93etp2TtpYl8p2x8paktx2ktY__"},
                     //{"dv", "MDExAAoALQALAxIAHgAAAF00AAwCACKKzc3Nzdoidjd5PmwtYD9gMGMzbF1tMm0bfgxlA3o5VjJXDAIAIoqenp6eib3pqOah87L_oP-v_KzzwvKt8oThk_qc5abJrcgHAgAEkZGRkQwCACKKb29vb3nFkdCe2YvKh9iH14TUi7qK1Yr8meuC5J3esdWwBwIABJGRkZEHAgAEkZGRkQ0CACaRkZnW96PirOu5-LXqteW25rmIuOe4zqvZsNav7IPngsGpyKbBpAkCADWws87Pu7u7u7u8RkdELSxLS29vYDR1O3wubyJ9InIhcS4fL3AvWTxOJ0E4exRwFVY-XzFWMwYCACiRkZGRkZGRkZGRlNfX18NSUlJXAwMDAAAAAAVRUVFTi4uLjtra2tgAEwIAJpGzs7Pbr9ur2OLN4pb_mviZt9W03bnM4oHug6zFq8-q0vyU4I3hFwIACpOTsrK37ILZgO8WAgAisMSvn7GCuom4gbiOv4a2j7eCtoO1hLGBtoW9j7yKvIS1jQQCAAaTk5GQpZMVAgAIkZGQzjjFVycBAgAGkZOTg47uBQIABJGRkZ0QAgABkQcCAASRkZGRDQIABZGRku3tDQIAHpGRkhAJXRxSFUcGSxRLG0gYR3ZGGUY2VyRXIE89WQcCAASRkZGRDQIAHpGRmZuC1pfZnsyNwJ_AkMOTzP3Nks293K_cq8S20g0CACaRkZmcvemo5qHzsv-g_6_8rPPC8q3yhOGT-pzlpsmtyIvjguyL7gkCADWws87Pu7u7u7uwbWxvBgdgYERESx9eEFcFRAlWCVkKWgU0BFsEchdlDGoTUD9bPn0VdBp9GAcCAASRkZGRCQIAJ4qIU1I_Pz8_PzDW1oLDjcqY2ZTLlMSXx5ipmcaZ74r4kfeOzaLGowwCACKKnp6enozpvfyy9afmq_Sr-6j4p5am-abQtceuyLHynfmcDAIAIopvb29vfCp-P3E2ZCVoN2g4aztkVWU6ZRN2BG0LcjFeOl8HAgAEkZGRkQkCACOGhcDBDAwMDAwTubntrOKl97b7pPur-Kj3xvap9oXwkv-W4g"},
                     {"callback", "parent.bd__pcbs__"+HttpUtil.GenerateCallBack()},
@@ -323,8 +329,7 @@ namespace Helper
             httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             //httpClient.DefaultRequestHeaders.Clear();            
             //httpClient.DefaultRequestHeaders.Add("Accept-Language", "zh-CN,zh;q=0.8");
-            //httpClient.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
-            string t2 = GetBaiduId();
+            //httpClient.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");a            
             HttpResponseMessage response = httpClient.PostAsync(new Uri(loginPostURL), httpContent).Result;
             response.EnsureSuccessStatusCode();
             String result = response.Content.ReadAsStringAsync().Result;

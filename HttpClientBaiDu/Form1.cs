@@ -45,7 +45,9 @@ namespace HttpClientBaiDu
         private void button1_Click(object sender, EventArgs e)
         {
             string res = loginBaidu.Login(this.textBox1.Text.Trim());
-            string baiduid = loginBaidu.GetBaiduId();
+            string test = loginBaidu.GetCookieValue("BAIDUID");
+            string test1 = loginBaidu.GetCookieValue("FP_UID");
+            this.label1.Text = string.Format("BAIDUID:{0}\r\nFP_UID:{1}\r\nres:{2}", test,test1,res);
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
