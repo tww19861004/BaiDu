@@ -24,7 +24,8 @@ namespace Helper
         protected string gid = null;
         protected string token;
         protected HttpClient httpClient = null;
-        public HttpClientHandler httpClientHandler = null;
+        protected HttpClientHandler httpClientHandler = null;
+        protected CookieContainer cookieContainer = null;
         protected string userName = null;
         protected string password = null;
         protected bool isNeedVerifyCode = true;//是否需要验证码        
@@ -81,23 +82,39 @@ namespace Helper
         public LoginBaiduBase(string userName, string password)
         {            
             gid = Guid.NewGuid().ToString().Substring(1);
-            var uri = new Uri("http://www.baidu.com");
             regex = new Regex(@"\{.*\}", RegexOptions.IgnoreCase);
-            httpClientHandler = new HttpClientHandler(){UseCookies=true};
-            httpClient = new HttpClient(httpClientHandler);
+
+            var uri = new Uri("http://www.baidu.com");
+            this.httpClientHandler = new HttpClientHandler() { AllowAutoRedirect=false};
+            this.httpClientHandler.CookieContainer = new CookieContainer();
+            httpClient = new HttpClient(this.httpClientHandler);            
             httpClient.MaxResponseContentBufferSize = 256000;
-            httpClient.DefaultRequestHeaders.Add("user-agent", UserAgent);
-
-            var contailer = CookieHelper.GetUriCookieContainer(uri);
-            string TEST1 = HttpUtil.GetCookieValue(contailer, "BAIDUID");
-            httpClientHandler.CookieContainer = contailer;
-
-            ////获取baiduid
-            //string baiduid = GetCookieValue("BAIDUID");
-            //if (string.IsNullOrEmpty(baiduid))
-            //{
-            //    throw new Exception("baiduid error");
-            //}
+            httpClient.DefaultRequestHeaders.Add("user-agent", UserAgent);                        
+            var result = httpClient.GetAsync(uri).Result;
+            var t1 = result.Headers.GetValues("Set-Cookie").ToList();
+            //this.httpClientHandler.CookieContainer.SetCookies(uri, string.Join(",", t1));
+            for (int i = 0; i < t1.Count(); i++)
+            {
+                string[] demo = t1[i].Split(new char[] { ';' });
+                if (demo != null && demo.Length == 5)
+                {
+                    httpClientHandler.CookieContainer.Add(new Cookie()
+                    {
+                        Expires = DateTime.Now.AddDays(2),
+                        Domain = demo[4].Substring(demo[4].IndexOf("=") + 1, demo[4].Length - demo[4].IndexOf("=") - 1),
+                        Name = demo[0].Substring(0, demo[0].IndexOf("=")),
+                        Value = demo[0].Substring(demo[0].IndexOf("=") + 1, demo[0].Length - demo[0].IndexOf("=") - 1),
+                        Path = demo[3].Substring(demo[3].IndexOf("=") + 1, demo[3].Length - demo[3].IndexOf("=") - 1)
+                    });
+                }
+            }
+            string baiduid = GetCookieValue("BAIDUID");
+            string FP_UID = GetCookieValue("FP_UID");
+            ////获取baiduid            
+            if (string.IsNullOrEmpty(baiduid))
+            {
+                throw new Exception("baiduid error");
+            }
 
             if (!GetToken())
             {
@@ -178,13 +195,11 @@ namespace Helper
                     {"logintype", "dialogLogin"},
                     {"callback", "bd__cbs__"+HttpUtil.GenerateCallBack()},
                 };
-            //SetBaiduId("9A3AE204FEB3DB727707A5A31732D168:FG=1");            
-            string s1 = GetCookieValue("BAIDUID");
-            string s2 = GetCookieValue("FP_UID");
+            string TEST10 =GetCookieValue("BAIDUID");
+            string TEST11 = GetCookieValue("FP_UID");            
             HttpResponseMessage response = httpClient.GetAsync(new Uri("https://passport.baidu.com/v2/api/?getapi&" + nvc.ToQueryString())).Result;
             response.EnsureSuccessStatusCode();
-            String Result = response.Content.ReadAsStringAsync().Result;                        
-            //SetBaiduId("C1E4B270B18E10C1334AE929582B4159:FG=1");            
+            String Result = response.Content.ReadAsStringAsync().Result;
             if (response.StatusCode.Equals(HttpStatusCode.OK))
             {
                 if (regex.IsMatch(Result))
@@ -215,7 +230,7 @@ namespace Helper
                 {"callback", "bd__cbs__"+HttpUtil.GenerateCallBack()},
             };
             HttpResponseMessage response = httpClient.GetAsync(new Uri("https://passport.baidu.com/v2/getpublickey?" + nvc.ToQueryString())).Result;
-            response.EnsureSuccessStatusCode();
+            response.EnsureSuccessStatusCode();            
             String Result = response.Content.ReadAsStringAsync().Result;
 
             if (response.StatusCode.Equals(HttpStatusCode.OK))
@@ -252,10 +267,11 @@ namespace Helper
             string s1 = GetCookieValue("BAIDUID");
             string s2 = GetCookieValue("FP_UID");
 
+            //HttpClient hc = new HttpClient(new HttpClientHandler() { CookieContainer = this.cookieContainer});
+
             HttpResponseMessage response = httpClient.GetAsync(new Uri("https://passport.baidu.com/v2/?reggetcodestr&" + nvc.ToQueryString())).Result;
             response.EnsureSuccessStatusCode();            
             String result = response.Content.ReadAsStringAsync().Result;            
-
             if (response.StatusCode.Equals(HttpStatusCode.OK))
             {
                 if (regex.IsMatch(result))
@@ -321,7 +337,7 @@ namespace Helper
                     {"crypttype", "12"},
                     {"ppui_logintime", HttpUtil.Generateplogintime()},
                     {"countrycode", ""},
-                    {"fp_uid", GetCookieValue("FP_UID")},
+                    {"fp_uid", string.IsNullOrEmpty(GetCookieValue("FP_UID"))?"a8e078358d61a058b43420dee15e9e77":GetCookieValue("FP_UID")},
                     //{"fp_info", "960338120bd__cbs__"+HttpUtil.GenerateCallBack()+"8b87eb0671ea3df2d002~~~nxnn3QqCEgie0x2_Unn6yqz090gtoCdtRC_qqz090gtoCd0RC_unmCsVnmCsJnnsEnm3pOq0xwEgi~JIJH4zEp4gVkJAVkFnERaUirBniP4~LPJoEWJ9HdXAFiBzieJAt~4Au~6IskJI2eJnTWcutK4gtOBgugJGJW6ItK8UsianJW6ItKanTw7AE-czFW4mTpXobP4AEYF3JAXAEdJI2M4AwQJzbNJnBRJzHq6UswJAhQ4gJPXnhiJzBHJAwQ6A~W9zukXIJiYgTHJAVk8zieBnE-4zuWcAVw6grNanTLJgiec3tKazhNJEs3FiJHJIBiaRHH4UFiazVw4mLrJn6NBziiBgE-vUnsBqC0Rae0v__DUnvSUnvNUnsPq0KUEgi~JIJH4zEp4gVkJAVkFnERaUirBniP4~LPJoEWJDT9XnhRXdBwBzEn4nuxXmT9XnhRXdBwBzEn4nuxXmT86IFHBzEp4nii4UFu7nERBIFw6zTicusPaUFw6zTi9zukXIJiYgTHJAVkFIwi6dEk6AbWJDTY4dbk6AbWJGFP6dENJAVkFzh-4AukIA0Rnvr3asEYmvaimkP9ZPOov3MEUsAYhIlrZVvKsPFKg1C3kC8nAXMtlhgYdySekQyus4nkJjvvvDXur5lZwCCb~s~aCkfVFUnsKUnsAUnszUnsrnn2LqC7zCNYkl_CqzBAVO4zhd4C__nUnsmnwLYXeksnnvdUnvbnweUkGbjUnvRUnvYUnveUnvpquc93etp2TtpYl8p2x8paktx2ktY__"},
                     //{"dv", "MDExAAoALQALAxIAHgAAAF00AAwCACKKzc3Nzdoidjd5PmwtYD9gMGMzbF1tMm0bfgxlA3o5VjJXDAIAIoqenp6eib3pqOah87L_oP-v_KzzwvKt8oThk_qc5abJrcgHAgAEkZGRkQwCACKKb29vb3nFkdCe2YvKh9iH14TUi7qK1Yr8meuC5J3esdWwBwIABJGRkZEHAgAEkZGRkQ0CACaRkZnW96PirOu5-LXqteW25rmIuOe4zqvZsNav7IPngsGpyKbBpAkCADWws87Pu7u7u7u8RkdELSxLS29vYDR1O3wubyJ9InIhcS4fL3AvWTxOJ0E4exRwFVY-XzFWMwYCACiRkZGRkZGRkZGRlNfX18NSUlJXAwMDAAAAAAVRUVFTi4uLjtra2tgAEwIAJpGzs7Pbr9ur2OLN4pb_mviZt9W03bnM4oHug6zFq8-q0vyU4I3hFwIACpOTsrK37ILZgO8WAgAisMSvn7GCuom4gbiOv4a2j7eCtoO1hLGBtoW9j7yKvIS1jQQCAAaTk5GQpZMVAgAIkZGQzjjFVycBAgAGkZOTg47uBQIABJGRkZ0QAgABkQcCAASRkZGRDQIABZGRku3tDQIAHpGRkhAJXRxSFUcGSxRLG0gYR3ZGGUY2VyRXIE89WQcCAASRkZGRDQIAHpGRmZuC1pfZnsyNwJ_AkMOTzP3Nks293K_cq8S20g0CACaRkZmcvemo5qHzsv-g_6_8rPPC8q3yhOGT-pzlpsmtyIvjguyL7gkCADWws87Pu7u7u7uwbWxvBgdgYERESx9eEFcFRAlWCVkKWgU0BFsEchdlDGoTUD9bPn0VdBp9GAcCAASRkZGRCQIAJ4qIU1I_Pz8_PzDW1oLDjcqY2ZTLlMSXx5ipmcaZ74r4kfeOzaLGowwCACKKnp6enozpvfyy9afmq_Sr-6j4p5am-abQtceuyLHynfmcDAIAIopvb29vfCp-P3E2ZCVoN2g4aztkVWU6ZRN2BG0LcjFeOl8HAgAEkZGRkQkCACOGhcDBDAwMDAwTubntrOKl97b7pPur-Kj3xvap9oXwkv-W4g"},
                     {"callback", "parent.bd__pcbs__"+HttpUtil.GenerateCallBack()},

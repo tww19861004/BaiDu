@@ -61,7 +61,7 @@ namespace Helper
             CookieContainer cookies = null;
 
             // 定义Cookie数据的大小。
-            int datasize = 256;
+            int datasize = 256000;
             StringBuilder cookieData = new StringBuilder(datasize);
 
             if (!InternetGetCookie(uri.ToString(), null, cookieData,

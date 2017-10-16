@@ -20,13 +20,13 @@ namespace HttpClientBaiDu
             InitializeComponent();
         }
 
-        private BaiduLoginmn loginBaidu = null;
+        private BaiduLoginWise loginBaidu = null;
 
         private void Form1_Load(object sender, EventArgs e)
         {
             try
             {
-                loginBaidu = new BaiduLoginmn("382233701@qq.com", "Tww19861004#");
+                loginBaidu = new BaiduLoginWise("382233701@qq.com", "Tww19861004#");
                 if (loginBaidu.IsNeedVerifyCode)
                 {
                     Stream s = loginBaidu.GetValidImage();

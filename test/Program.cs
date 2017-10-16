@@ -17,38 +17,26 @@ namespace test
     {
         static void Main(string[] args)
         {
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.UseCookies = true;
+            //Mothod1
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create("http://www.baidu.com");
+            request.CookieContainer = new CookieContainer();
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            int i1 = response.Cookies.Count; //这个是 3
+            int i2 = request.CookieContainer.Count;//这个是 2
+
+            //Mothod2
             var uri = new Uri("http://www.baidu.com");
-
-            //handler.CookieContainer.SetCookies(uri, "aas=test");
-            HttpClient client = new HttpClient(handler);
-
-            var result = client.GetStringAsync(uri);
-            Console.WriteLine(result.Result);
-            string TEST10 = HttpUtil.GetCookieValue(handler.CookieContainer, "BAIDUID");
-            var getCookies = handler.CookieContainer.GetCookies(uri);
-            Console.WriteLine("获取到的cookie数量：" + getCookies.Count);
-            Console.WriteLine("获取到的cookie：");
-            for (int i = 0; i < getCookies.Count; i++)
-            {
-                Console.WriteLine(getCookies[i].Name + ":" + getCookies[i].Value);
-            }
-            Console.WriteLine("=".PadRight(50, '='));
-            Console.WriteLine(handler.CookieContainer.PerDomainCapacity);
-
             string str1 = CookieHelper.GetCookies("http://www.baidu.com");
+            //var contailer = CookieHelper.GetUriCookieContainer(uri);            
+            HttpClientHandler handler = new HttpClientHandler() {};            
+            HttpClient client = new HttpClient(handler);                      
+            var result = client.GetAsync(uri).Result;
 
-            var contailer = CookieHelper.GetUriCookieContainer(new Uri("http://www.baidu.com"));
+            var lst = result.Headers.GetValues("Set-Cookie").ToList();
+            var lst1 = handler.CookieContainer.GetCookies(uri);
 
-            string TEST1 = HttpUtil.GetCookieValue(contailer, "BAIDUID");
-            //LoginBaiduBase loginBaidu = new LoginBaiduBase("382233701@qq.com","Tww19861004#");
-            //string res = loginBaidu.Login("");
-            //string test = loginBaidu.GetCookieValue("BAIDUID");
-            //string test1 = loginBaidu.GetCookieValue("FP_UID");
-            //Console.Write(string.Format("BAIDUID:{0}\r\nFP_UID:{1}\r\nres:{2}", test, test1, res));
-
-            
+            //Mothod3
+            var lst3 = CookieHelper.GetUriCookieContainer(uri);
 
             Console.ReadKey();
         }
